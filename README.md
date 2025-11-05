@@ -1,6 +1,6 @@
 # Nillion Collection Explorer UI
 
-A Next.js TypeScript application for creating and managing Nillion Storage schemas, collections, and records.
+A `Next.js` TypeScript application for creating and managing Nillion Storage schemas, collections, and records.
 
 ## Features
 
