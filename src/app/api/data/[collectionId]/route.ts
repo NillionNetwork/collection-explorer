@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { randomUUID } from 'node:crypto';
 import { getNillionClient } from '@/lib/nillion-client';
 import { getConfigFromHeaders, validateServerConfig } from '@/lib/server-config';
+import '@/lib/bigint-serializer';
 
 // Helper function to process data with secret fields
 function processDataForStorage(data: Record<string, any>): Record<string, any> {
