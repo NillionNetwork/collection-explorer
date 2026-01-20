@@ -3,7 +3,7 @@
 
 export const TESTNET_CONFIG = {
   NILCHAIN_URL: 'http://rpc.testnet.nilchain-rpc-proxy.nilogy.xyz',
-  NILAUTH_URL: 'https://nilauth.sandbox.app-cluster.sandbox.nilogy.xyz',
+  NILAUTH_URL: 'https://nilauth-1bc3.staging.nillion.network',
   NILDB_NODES: [
     'https://nildb-stg-n1.nillion.network',
     'https://nildb-stg-n2.nillion.network',

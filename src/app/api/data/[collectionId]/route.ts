@@ -85,23 +85,10 @@ export async function POST(
       ...processDataForStorage(record),
     }));
 
-    if (type === 'owned') {
-      // For owned data, use standard data creation
-      await client.createStandardData({
-        body: {
-          collection: collectionId,
-          data: processedData,
-        },
-        });
-    } else {
-      // For standard data
-      await client.createStandardData({
-        body: {
-          collection: collectionId,
-          data: processedData,
-        },
-      });
-    }
+    await client.createStandardData({
+      collection: collectionId,
+      data: processedData,
+    });
 
     return NextResponse.json({
       success: true,
@@ -110,7 +97,7 @@ export async function POST(
     });
   } catch (error) {
     return NextResponse.json(
-      { success: false, error: 'Failed to add data' },
+      { success: false, error: 'Failed to add data', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }
@@ -155,21 +142,11 @@ export async function PUT(
 
       const processedData = processDataForStorage(updatedRecord);
 
-      if (type === 'owned') {
-        await client.createStandardData({
-          body: {
-            collection: collectionId,
-            data: [processedData],
-          },
-        });
-      } else {
-        await client.createStandardData({
-          body: {
-            collection: collectionId,
-            data: [processedData],
-          },
-        });
-      }
+      // TODO: Revisit for userOwned: SecretVaultUserClient.createData
+      await client.createStandardData({
+        collection: collectionId,
+        data: [processedData],
+      });
 
       return NextResponse.json({
         success: true,

@@ -9,8 +9,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@nillion/nuc": "0.1.1",
-    "@nillion/secretvaults": "0.1.7",
+    "@nillion/nilauth-client": "2.0.0",
+    "@nillion/nuc": "2.0.0",
+    "@nillion/secretvaults": "2.0.0",
     "next": "15.4.8",
     "react": "19.0.1",
     "react-dom": "19.0.1",
@@ -28,5 +29,10 @@
     "postcss": "^8.5.0",
     "autoprefixer": "^10.4.20"
   },
-  "packageManager": "pnpm@10.12.4"
+  "packageManager": "pnpm@10.12.4",
+  "pnpm": {
+    "overrides": {
+      "libsodium-wrappers-sumo": "0.8.0"
+    }
+  }
 }
