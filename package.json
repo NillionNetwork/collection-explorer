@@ -9,10 +9,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@nillion/nilauth-client": "2.0.0",
-    "@nillion/nuc": "2.0.0",
-    "@nillion/secretvaults": "2.0.0",
-    "next": "15.4.8",
+    "@nillion/nuc": "0.1.1",
+    "@nillion/secretvaults": "0.1.7",
+    "next": "15.4.10",
     "react": "19.0.1",
     "react-dom": "19.0.1",
     "dotenv": "^17.2.0",
