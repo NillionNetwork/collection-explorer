@@ -23,7 +23,6 @@ export function SettingsModal({
   const [selectedPreset, setSelectedPreset] =
     useState<PresetType>(currentPreset);
   const [formValues, setFormValues] = useState({
-    NILCHAIN_URL: "",
     NILAUTH_URL: "",
     NILDB_NODES: ["", "", ""],
     NILLION_API_KEY: "",
@@ -33,7 +32,6 @@ export function SettingsModal({
     if (open) {
       setSelectedPreset(currentPreset);
       setFormValues({
-        NILCHAIN_URL: currentConfig.NILCHAIN_URL,
         NILAUTH_URL: currentConfig.NILAUTH_URL,
         NILDB_NODES: [...currentConfig.NILDB_NODES],
         NILLION_API_KEY: currentConfig.NILLION_API_KEY || "",
@@ -56,7 +54,6 @@ export function SettingsModal({
       // Load preset values but keep the current API key
       const presetConfig = PRESET_CONFIGS[preset];
       setFormValues({
-        NILCHAIN_URL: presetConfig.NILCHAIN_URL,
         NILAUTH_URL: presetConfig.NILAUTH_URL,
         NILDB_NODES: [...presetConfig.NILDB_NODES],
         NILLION_API_KEY: formValues.NILLION_API_KEY,
@@ -179,20 +176,6 @@ export function SettingsModal({
           </div>
 
           <div className="space-y-2">
-            <div>
-              <label className="block text-xs font-medium tracking-wide uppercase mb-1">
-                Nilchain URL
-              </label>
-              <input
-                type="text"
-                value={formValues.NILCHAIN_URL}
-                onChange={(e) =>
-                  handleInputChange("NILCHAIN_URL", e.target.value)
-                }
-                className="w-full font-mono text-sm"
-              />
-            </div>
-
             <div>
               <label className="block text-xs font-medium tracking-wide uppercase mb-1">
                 Nilauth URL

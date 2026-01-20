@@ -9,7 +9,7 @@ export function validateConfig() {
   }
   
   // Validate network config exists
-  if (!config.NILCHAIN_URL || !config.NILAUTH_URL || !config.NILDB_NODES.length) {
+  if (!config.NILAUTH_URL || !config.NILDB_NODES.length) {
     throw new Error('Network configuration is invalid - please check your settings');
   }
 }
