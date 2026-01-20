@@ -28,7 +28,7 @@ export function validateServerConfig(config: NetworkConfigType) {
     throw new Error('NILLION_API_KEY is required - please set it in the Network Configuration settings');
   }
   
-  if (!config.NILCHAIN_URL || !config.NILAUTH_URL || !config.NILDB_NODES.length) {
+  if (!config.NILAUTH_URL || !config.NILDB_NODES.length) {
     throw new Error('Network configuration is invalid - please check your settings');
   }
 }
