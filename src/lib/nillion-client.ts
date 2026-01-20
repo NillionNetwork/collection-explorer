@@ -32,7 +32,7 @@ export async function getNillionClient(config: NetworkConfigType): Promise<Secre
   } catch (profileError) {
     try {
       await builder.register({
-        did: builderDid,
+        did: builderDid.didString,
         name: 'Demo UI Builder',
       });
     } catch (registerError) {

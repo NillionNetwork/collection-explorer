@@ -9,24 +9,25 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@nillion/nuc": "0.1.1",
-    "@nillion/secretvaults": "0.1.7",
+    "@nillion/nilauth-client": "2.0.0",
+    "@nillion/nuc": "2.0.0",
+    "@nillion/secretvaults": "2.0.0",
+    "dotenv": "^17.2.0",
     "next": "15.4.10",
     "react": "19.0.1",
     "react-dom": "19.0.1",
-    "dotenv": "^17.2.0",
     "zod": "^3.25.67"
   },
   "devDependencies": {
     "@types/node": "^24.0.12",
     "@types/react": "^19.0.3",
     "@types/react-dom": "^19.0.3",
+    "autoprefixer": "^10.4.20",
     "eslint": "^9.0.0",
     "eslint-config-next": "15.1.6",
-    "typescript": "^5.8.3",
-    "tailwindcss": "^3.4.17",
     "postcss": "^8.5.0",
-    "autoprefixer": "^10.4.20"
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.8.3"
   },
   "packageManager": "pnpm@10.12.4",
   "pnpm": {
