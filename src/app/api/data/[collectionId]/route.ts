@@ -162,7 +162,6 @@ export async function PUT(
 
       const processedData = processDataForStorage(updatedRecord);
 
-      // TODO: Revisit for userOwned: SecretVaultUserClient.createData
       await client.createStandardData({
         collection: collectionId,
         data: [processedData],
