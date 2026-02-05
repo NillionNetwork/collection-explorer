@@ -1,5 +1,5 @@
 {
-  "name": "Nillion Collection Explorer",
+  "name": "Nillion Collection Explorer - Legacy",
   "version": "0.1.0",
   "scripts": {
     "dev": "next dev",
