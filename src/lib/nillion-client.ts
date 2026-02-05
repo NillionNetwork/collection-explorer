@@ -4,7 +4,10 @@ import { SecretVaultBuilderClient } from '@nillion/secretvaults';
 import type { NetworkConfigType } from './server-config';
 
 // Server-side Nillion client that accepts config as parameter
-export async function getNillionClient(config: NetworkConfigType): Promise<SecretVaultBuilderClient> {
+export async function getNillionClient(
+  config: NetworkConfigType,
+  options?: { blindfold?: boolean; blindfoldSeed?: string }
+): Promise<SecretVaultBuilderClient> {
   if (!config.NILLION_API_KEY) {
     throw new Error('NILLION_API_KEY is required - please set it in the Network Configuration settings');
   }
@@ -21,6 +24,14 @@ export async function getNillionClient(config: NetworkConfigType): Promise<Secre
   const builder = await SecretVaultBuilderClient.from({
     signer,
     dbs: [...config.NILDB_NODES],
+    ...(options?.blindfold
+      ? {
+          blindfold: {
+            operation: 'store',
+            seed: options?.blindfoldSeed ?? config.NILLION_API_KEY,
+          },
+        }
+      : {}),
     nilauthClient,
   });
 
