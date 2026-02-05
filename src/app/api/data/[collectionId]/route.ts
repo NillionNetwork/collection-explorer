@@ -4,6 +4,22 @@ import { getNillionClient } from '@/lib/nillion-client';
 import { getConfigFromHeaders, validateServerConfig } from '@/lib/server-config';
 import '@/lib/bigint-serializer';
 
+const hasAllotValue = (value: unknown): boolean => {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  if (Array.isArray(value)) {
+    return value.some(hasAllotValue);
+  }
+
+  if ('%allot' in value) {
+    return true;
+  }
+
+  return Object.values(value as Record<string, unknown>).some(hasAllotValue);
+};
+
 // Helper function to process data with secret fields
 function processDataForStorage(data: Record<string, any>): Record<string, any> {
   const processed = { ...data };
@@ -27,15 +43,17 @@ export async function GET(
     const { searchParams } = new URL(request.url);
     const filterParam = searchParams.get('filter');
     const limitParam = searchParams.get('limit');
+    const revealParam = searchParams.get('reveal');
     
     const filter = filterParam ? JSON.parse(filterParam) : {};
     const limit = limitParam ? parseInt(limitParam) : undefined;
+    const reveal = revealParam === '1' || revealParam === 'true';
     
     // Get config from headers
     const config = getConfigFromHeaders(request.headers);
     validateServerConfig(config);
     
-    const client = await getNillionClient(config);
+    const client = await getNillionClient(config, { blindfold: reveal });
     const result = await client.findData({
       collection: collectionId,
       filter,
@@ -73,8 +91,6 @@ export async function POST(
     // Get config from headers
     const config = getConfigFromHeaders(request.headers);
     validateServerConfig(config);
-    
-    const client = await getNillionClient(config);
 
     // Handle both single record and array of records
     const dataArray = Array.isArray(rawData) ? rawData : [rawData];
@@ -85,23 +101,13 @@ export async function POST(
       ...processDataForStorage(record),
     }));
 
-    if (type === 'owned') {
-      // For owned data, use standard data creation
-      await client.createStandardData({
-        body: {
-          collection: collectionId,
-          data: processedData,
-        },
-        });
-    } else {
-      // For standard data
-      await client.createStandardData({
-        body: {
-          collection: collectionId,
-          data: processedData,
-        },
-      });
-    }
+    const useBlindfold = processedData.some(record => hasAllotValue(record));
+    const client = await getNillionClient(config, { blindfold: useBlindfold });
+
+    await client.createStandardData({
+      collection: collectionId,
+      data: processedData,
+    });
 
     return NextResponse.json({
       success: true,
@@ -110,7 +116,7 @@ export async function POST(
     });
   } catch (error) {
     return NextResponse.json(
-      { success: false, error: 'Failed to add data' },
+      { success: false, error: 'Failed to add data', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }
@@ -136,7 +142,8 @@ export async function PUT(
     const config = getConfigFromHeaders(request.headers);
     validateServerConfig(config);
     
-    const client = await getNillionClient(config);
+    const useBlindfold = hasAllotValue(update);
+    const client = await getNillionClient(config, { blindfold: useBlindfold });
     
     // For records with encrypted fields, use delete + create approach
     // as updateData might not work properly with encrypted fields
@@ -155,21 +162,10 @@ export async function PUT(
 
       const processedData = processDataForStorage(updatedRecord);
 
-      if (type === 'owned') {
-        await client.createStandardData({
-          body: {
-            collection: collectionId,
-            data: [processedData],
-          },
-        });
-      } else {
-        await client.createStandardData({
-          body: {
-            collection: collectionId,
-            data: [processedData],
-          },
-        });
-      }
+      await client.createStandardData({
+        collection: collectionId,
+        data: [processedData],
+      });
 
       return NextResponse.json({
         success: true,

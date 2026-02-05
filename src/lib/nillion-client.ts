@@ -1,27 +1,38 @@
-import { Keypair } from '@nillion/nuc';
-import { SecretVaultBuilderClient, Did } from '@nillion/secretvaults';
+import { Signer } from '@nillion/nuc';
+import { NilauthClient } from '@nillion/nilauth-client';
+import { SecretVaultBuilderClient } from '@nillion/secretvaults';
 import type { NetworkConfigType } from './server-config';
 
 // Server-side Nillion client that accepts config as parameter
-export async function getNillionClient(config: NetworkConfigType): Promise<SecretVaultBuilderClient> {
+export async function getNillionClient(
+  config: NetworkConfigType,
+  options?: { blindfold?: boolean; blindfoldSeed?: string }
+): Promise<SecretVaultBuilderClient> {
   if (!config.NILLION_API_KEY) {
     throw new Error('NILLION_API_KEY is required - please set it in the Network Configuration settings');
   }
 
-  const builderKeypair = Keypair.from(config.NILLION_API_KEY);
-  const builderDid = builderKeypair.toDid().toString();
+  const signer = Signer.fromPrivateKey(config.NILLION_API_KEY);
+  const builderDid = await signer.getDid();
+  const isTestnet = config.NILAUTH_URL.includes('staging') || config.NILAUTH_URL.includes('testnet');
+  const nilauthClient = await NilauthClient.create({
+    baseUrl: config.NILAUTH_URL,
+    chainId: isTestnet ? 11155111 : 1,
+  });
 
   // Create builder client
   const builder = await SecretVaultBuilderClient.from({
-    keypair: builderKeypair,
-    urls: {
-      chain: config.NILCHAIN_URL,
-      auth: config.NILAUTH_URL,
-      dbs: [...config.NILDB_NODES],
-    },
-    blindfold: {
-      operation: 'store',
-    },
+    signer,
+    dbs: [...config.NILDB_NODES],
+    ...(options?.blindfold
+      ? {
+          blindfold: {
+            operation: 'store',
+            seed: options?.blindfoldSeed ?? config.NILLION_API_KEY,
+          },
+        }
+      : {}),
+    nilauthClient,
   });
 
   await builder.refreshRootToken();
@@ -32,7 +43,7 @@ export async function getNillionClient(config: NetworkConfigType): Promise<Secre
   } catch (profileError) {
     try {
       await builder.register({
-        did: Did.parse(builderDid),
+        did: builderDid.didString,
         name: 'Demo UI Builder',
       });
     } catch (registerError) {
@@ -48,10 +59,12 @@ export async function getNillionClient(config: NetworkConfigType): Promise<Secre
   return builder;
 }
 
-export function getBuilderKeypair(apiKey: string): Keypair {
-  return Keypair.from(apiKey);
+export function getBuilderSigner(apiKey: string): Signer {
+  return Signer.fromPrivateKey(apiKey);
 }
 
-export function getBuilderDid(apiKey: string): string {
-  return getBuilderKeypair(apiKey).toDid().toString();
+export async function getBuilderDid(apiKey: string): Promise<string> {
+  const signer = getBuilderSigner(apiKey);
+  const did = await signer.getDid();
+  return did.didString;
 }

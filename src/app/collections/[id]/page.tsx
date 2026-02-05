@@ -94,24 +94,6 @@ export default function CollectionDetailPage() {
           schema: schema,
         });
 
-        // Fetch records immediately after collection is loaded
-        try {
-          const response = await apiFetch(`/api/data/${collectionId}`);
-          const data = await response.json();
-
-          if (!data.success) {
-            throw new Error(data.error || 'Failed to fetch records');
-          }
-
-          setRecords(data.data || []);
-          setRecordsError(null);
-        } catch (recordsErr) {
-          setRecordsError(
-            recordsErr instanceof Error
-              ? recordsErr.message
-              : 'Failed to load records'
-          );
-        }
       } catch (err) {
         // Failed to load collection data
         setError(
@@ -125,6 +107,11 @@ export default function CollectionDetailPage() {
 
     fetchCollectionData();
   }, [collectionId]);
+
+  useEffect(() => {
+    if (!collectionId || !collection) return;
+    fetchRecords(showEncryptedData);
+  }, [collectionId, collection, showEncryptedData]);
 
   const fetchCollectionMetadata = async () => {
     try {
@@ -153,12 +140,14 @@ export default function CollectionDetailPage() {
     }
   };
 
-  const fetchRecords = async () => {
+  const fetchRecords = async (reveal: boolean = showEncryptedData) => {
     try {
       setRecordsLoading(true);
       setRecordsError(null);
 
-      const response = await apiFetch(`/api/data/${collectionId}`);
+      const response = await apiFetch(
+        `/api/data/${collectionId}${reveal ? '?reveal=1' : ''}`
+      );
       const data = await response.json();
 
       if (!data.success) {
@@ -175,7 +164,7 @@ export default function CollectionDetailPage() {
 
   const refreshData = async () => {
     // Refresh both records and metadata
-    await Promise.all([fetchRecords(), fetchCollectionMetadata()]);
+    await Promise.all([fetchRecords(showEncryptedData), fetchCollectionMetadata()]);
   };
 
   const handleEdit = (record: any) => {
