@@ -1,5 +1,4 @@
 import { Signer } from '@nillion/nuc';
-import { NilauthClient } from '@nillion/nilauth-client';
 import { SecretVaultBuilderClient } from '@nillion/secretvaults';
 import type { NetworkConfigType } from './server-config';
 
@@ -14,11 +13,6 @@ export async function getNillionClient(
 
   const signer = Signer.fromPrivateKey(config.NILLION_API_KEY);
   const builderDid = await signer.getDid();
-  const isTestnet = config.NILAUTH_URL.includes('staging') || config.NILAUTH_URL.includes('testnet');
-  const nilauthClient = await NilauthClient.create({
-    baseUrl: config.NILAUTH_URL,
-    chainId: isTestnet ? 11155111 : 1,
-  });
 
   // Create builder client
   const builder = await SecretVaultBuilderClient.from({
@@ -28,14 +22,10 @@ export async function getNillionClient(
       ? {
           blindfold: {
             operation: 'store',
-            seed: options?.blindfoldSeed ?? config.NILLION_API_KEY,
           },
         }
       : {}),
-    nilauthClient,
   });
-
-  await builder.refreshRootToken();
 
   // One-time registration check (only needed once per builder DID)
   try {
@@ -57,14 +47,4 @@ export async function getNillionClient(
   }
 
   return builder;
-}
-
-export function getBuilderSigner(apiKey: string): Signer {
-  return Signer.fromPrivateKey(apiKey);
-}
-
-export async function getBuilderDid(apiKey: string): Promise<string> {
-  const signer = getBuilderSigner(apiKey);
-  const did = await signer.getDid();
-  return did.didString;
 }
