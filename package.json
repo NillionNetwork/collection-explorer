@@ -1,6 +1,6 @@
 {
   "name": "Nillion Collection Explorer",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -9,13 +9,13 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@nillion/nilauth-client": "2.0.0",
     "@nillion/nuc": "2.0.0",
-    "@nillion/secretvaults": "2.0.0",
+    "@nillion/secretvaults": "3.0.0",
     "dotenv": "^17.2.0",
-    "next": "15.4.10",
+    "next": "15.5.14",
     "react": "19.0.1",
     "react-dom": "19.0.1",
+    "viem": "^2.47.6",
     "zod": "^3.25.67"
   },
   "devDependencies": {

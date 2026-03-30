@@ -5,6 +5,10 @@ import { TESTNET_CONFIG } from '@/lib/network-config';
 
 export type NetworkConfigType = typeof TESTNET_CONFIG & {
   NILLION_API_KEY: string;
+  SIGNER_MODE: 'web3' | 'apiKey';
+  WALLET_ADDRESS: string;
+  WALLET_DID: string;
+  WALLET_CHAIN_ID: number;
 };
 
 export type PresetType = 'testnet' | 'custom';
@@ -24,6 +28,10 @@ const PRESET_KEY = 'nillion-network-preset';
 const DEFAULT_CONFIG: NetworkConfigType = {
   ...TESTNET_CONFIG,
   NILLION_API_KEY: '',
+  SIGNER_MODE: 'web3',
+  WALLET_ADDRESS: '',
+  WALLET_DID: '',
+  WALLET_CHAIN_ID: 11155111,
 };
 
 export const PRESET_CONFIGS = {
@@ -42,7 +50,10 @@ export function NetworkConfigProvider({ children }: { children: ReactNode }) {
     if (savedConfig) {
       try {
         const parsedConfig = JSON.parse(savedConfig);
-        setCurrentConfig(parsedConfig);
+        setCurrentConfig({
+          ...DEFAULT_CONFIG,
+          ...parsedConfig,
+        });
       } catch (e) {
         // Reset to default if config is corrupted
       }

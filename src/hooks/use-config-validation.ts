@@ -27,11 +27,14 @@ export function useConfigValidation() {
     // Only validate on non-home pages
     if (pathname !== '/') {
       const hasApiKey = currentConfig.NILLION_API_KEY && currentConfig.NILLION_API_KEY.trim() !== '';
+      const hasWallet = currentConfig.WALLET_ADDRESS && currentConfig.WALLET_ADDRESS.trim() !== '';
+      const hasValidAuth =
+        currentConfig.SIGNER_MODE === 'web3' ? hasWallet : hasApiKey;
       
-      if (!hasApiKey && !hasBeenDismissed) {
+      if (!hasValidAuth && !hasBeenDismissed) {
         setShouldShowSettings(true);
-      } else if (hasApiKey) {
-        // Reset dismissal state when API key is present
+      } else if (hasValidAuth) {
+        // Reset dismissal state when auth is present
         setHasBeenDismissed(false);
         setShouldShowSettings(false);
       }
@@ -40,7 +43,14 @@ export function useConfigValidation() {
       setShouldShowSettings(false);
       setHasBeenDismissed(false);
     }
-  }, [pathname, currentConfig.NILLION_API_KEY, hasBeenDismissed, isInitialized]);
+  }, [
+    pathname,
+    currentConfig.NILLION_API_KEY,
+    currentConfig.SIGNER_MODE,
+    currentConfig.WALLET_ADDRESS,
+    hasBeenDismissed,
+    isInitialized,
+  ]);
 
   const dismissSettings = () => {
     setShouldShowSettings(false);
@@ -50,6 +60,8 @@ export function useConfigValidation() {
   return {
     shouldShowSettings,
     dismissSettings,
-    isApiKeyMissing: !currentConfig.NILLION_API_KEY || currentConfig.NILLION_API_KEY.trim() === '',
+    isApiKeyMissing:
+      currentConfig.SIGNER_MODE === 'apiKey' &&
+      (!currentConfig.NILLION_API_KEY || currentConfig.NILLION_API_KEY.trim() === ''),
   };
 }
